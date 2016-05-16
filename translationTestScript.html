@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+	<title>Translation Script Demo Page</title>
+<head>
+<body>
+
+<script>
+function reply(translatedTxt){
+	console.log(translatedTxt);
+}
+
+function translate(replyfn, untransTxt, lang){;
+	var http = new XMLHttpRequest();
+	http.addEventListener('load', reqListener);
+	
+	function reqListener(){
+		resp = JSON.parse(this.responseText);
+		resp = resp['text'][0];
+		replyfn(resp,untransTxt);
+	}
+
+	//note: assumes special chars have been escaped. 
+	var inputText = untransTxt;
+	var dir = 'en-' + lang;
+	var yandexKey = '[key goes here]';
+	var url = 'https://translate.yandex.net/api/v1.5/tr.json/translate?key='+ yandexKey + '&text=' + inputText + '&lang=' + dir;
+	http.open("POST", url, true);
+	http.send();
+}
+var inputText = prompt('text to translate:'); //will use texted input, eventually. 
+translate(reply, inputText, 'es');
+
+</script>
+</body>
+</html>
