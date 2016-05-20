@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var request = require('request');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -33,7 +34,23 @@ router.get('/twilioReceive', function(req, res, next) {
   // ApiVersion=2010-04-01
   
   res.setHeader('Content-Type', 'application/xml');
-  res.status(200).send('<?xml version="1.0" encoding="UTF-8"?><Response><Message> I am going to translate '+req.query.Body+' for you.</Message></Response>');
-});
+  // res.status(200).send('<?xml version="1.0" encoding="UTF-8"?><Response><Message> I am going to translate '+req.query.Body+' for you.</Message></Response>');
+  next();
+},
+function(req, res){
+  var textotrans = req.query.Body;
+
+  var formdata = {
+    key:'',
+    text: textotrans,
+    lang: 'en-es'
+  };
+
+  request.post({url : 'https://translate.yandex.net/api/v1.5/tr.json/translate', form: formdata}, function(err, httpResponse, body){
+    var info = JSON.parse(body);
+    res.status(200).send('<?xml version="1.0" encoding="UTF-8"?><Response><Message> translation: '+info.text+'</Message></Response>');
+  });
+}
+);
 
 module.exports = router;
