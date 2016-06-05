@@ -1,5 +1,5 @@
 # transl8
-SMS translation service that doesn't rely on smart phones. 
+Simple text messaging translation app, powered by [Yandex](http://translate.yandex.com).
 
 ## With node.js
 cd twilio_webhook && npm install
