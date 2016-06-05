@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var request = require('request');
 
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -38,19 +39,74 @@ router.get('/twilioReceive', function(req, res, next) {
   next();
 },
 function(req, res){
-  var textotrans = req.query.Body;
+  var textBody = req.query.Body;
+  var formdata = respond(textBody);
+  console.log(formdata);
 
-  var formdata = {
-    key:'',
-    text: textotrans,
-    lang: 'en-es'
-  };
 
-  request.post({url : 'https://translate.yandex.net/api/v1.5/tr.json/translate', form: formdata}, function(err, httpResponse, body){
-    var info = JSON.parse(body);
-    res.status(200).send('<?xml version="1.0" encoding="UTF-8"?><Response><Message> translation: '+info.text+'</Message></Response>');
-  });
+  if (typeof(formdata) === "object") {
+     request.post({url : 'https://translate.yandex.net/api/v1.5/tr.json/translate', form: formdata}, function(err, httpResponse, body){
+      if (httpResponse.statusCode == 200) {
+        var info = JSON.parse(body);
+        res.status(200).send('<?xml version="1.0" encoding="UTF-8"?><Response><Message>'+ info.text+'</Message></Response>');
+      }
+    });   
+   } else {
+     res.status(200).send('<?xml version="1.0" encoding="UTF-8"?><Response><Message>'+ formdata +'</Message></Response>');
+   }
+
 }
 );
 
 module.exports = router;
+ 
+
+
+//takes body of text message, if it matches required regex will send to yandex, else will respond with reprompt. 
+function respond(incomingText){
+  var userText = incomingText;
+  var langCodes = ['en','es','zh','ar','vi','ru'];
+  var langRequested = /^\d\s\w/g.test(userText);
+  var langDirRequested = /([0-5]>[0-5])\s/g.test(userText);
+
+  var fromLang = '';
+  var toLang = '';
+  var untransTxt = '';
+  var formdata = {
+    key:'trnsl.1.1.20160514T231517Z.39e466bf8f5c56f0.a537525df26ee77384f8b4a9ee3547744b676252',
+    text: '',
+    lang: ''
+    }
+  //if language requested, get numbers from matching positions, map to language code. 
+  if(langDirRequested){
+    fromLang = langCodes[parseInt(userText[0])];
+    toLang = langCodes[parseInt(userText[2])];
+
+    formdata['text'] = userText.substring(4);
+    formdata['lang'] = fromLang + '-' + toLang;
+  
+  console.log(formdata);
+  return formdata;
+
+  } else if (langRequested) { //else if only a 'to' language requested, default 'from' direction = english.  
+    fromLang = 'en';
+    toLang = langCodes[parseInt(userText[0])];
+    untransTxt = userText.substring(2);
+
+    formdata['text'] = untransTxt;
+    formdata['lang'] = fromLang + '-' + toLang;
+
+    console.log(formdata);
+    return formdata;
+
+  } else if(userText == "???"){ //help retuquest
+      return "Text the number that matches the language you want, followed by the text to translate. EX: 1 Hello! --> Hola! For more options, text ***."
+  } else if(userText == "***") {
+      return "Use the > for more control. Format: [FROM]>[TO] Text. EX: 1>0 Hola! --> Hello! // 1>2 Hola --> 你好!";
+  } else if(isUnicode){
+    return "unicode word detected";
+  }
+  else { //invalid translation request format
+    return "Options: 0:English 1: Español 2:中文 3:Arabic 4:Người việt nam 5:Pусский язык ???:Help. Powered by Yandex.";
+  }
+} //end respond
