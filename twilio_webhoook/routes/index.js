@@ -65,7 +65,7 @@ module.exports = router;
 //takes body of text message, if it matches required regex will send to yandex, else will respond with reprompt. 
 function respond(incomingText){
   var userText = incomingText;
-  var langCodes = ['en','es','zh','ar','vi','ru'];
+  var langCodes = ['ar','en','es','fr','ro','ru','tl','vi','zh'];
   var langRequested = /^\d\s\w/g.test(userText);
   var langDirRequested = /([0-5]>[0-5])\s/g.test(userText);
 
@@ -104,6 +104,6 @@ function respond(incomingText){
   } else if(userText == "***") {
       return "Use the > for more control. Format: [FROM]>[TO] Text. EX: 1>0 Hola! --> Hello! // 1>2 Hola --> 你好!";
   } else { //invalid translation request format
-    return "Options: 0:English 1: Español 2:中文 3:Arabic 4:Người việt nam 5:Pусский язык ???:Help. Powered by Yandex.";
+    return "Options: 0:Arabic 1:English 2:Español 3:Francais 4:Romanian 5:Pусский язык 6:Telegu 7:Người việt nam 8:中文 ???:Help. Powered by Yandex.";
   }
 } //end respond
