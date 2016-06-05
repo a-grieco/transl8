@@ -73,7 +73,7 @@ function respond(incomingText){
   var toLang = '';
   var untransTxt = '';
   var formdata = {
-    key:'trnsl.1.1.20160514T231517Z.39e466bf8f5c56f0.a537525df26ee77384f8b4a9ee3547744b676252',
+    key:'',
     text: '',
     lang: ''
     }
@@ -103,10 +103,7 @@ function respond(incomingText){
       return "Text the number that matches the language you want, followed by the text to translate. EX: 1 Hello! --> Hola! For more options, text ***."
   } else if(userText == "***") {
       return "Use the > for more control. Format: [FROM]>[TO] Text. EX: 1>0 Hola! --> Hello! // 1>2 Hola --> 你好!";
-  } else if(isUnicode){
-    return "unicode word detected";
-  }
-  else { //invalid translation request format
+  } else { //invalid translation request format
     return "Options: 0:English 1: Español 2:中文 3:Arabic 4:Người việt nam 5:Pусский язык ???:Help. Powered by Yandex.";
   }
 } //end respond
